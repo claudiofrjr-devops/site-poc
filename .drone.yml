@@ -21,18 +21,17 @@ steps:
       - name: dockersock
         path: /var/run
     privileged: true
+    commands:
+      - sleep 5 ## give docker enough time to start
+      - echo "$docker_password" | docker login -u "$docker_username" --password-stdin
+      - docker build -t lunavirtualnet/poc-site:${DRONE_COMMIT_SHA:0:7} .
+      - docker push lunavirtualnet/poc-site:${DRONE_COMMIT_SHA:0:7}
     settings:
       repo: claudiofrjr-devops/site-poc
       username:
         from_secret: docker_username
       password:
-        from_secret: docker_password
-    commands:
-      - echo "You can call the secrets like this examples below."
-      - echo $USERNAME
-      - echo $PASSWORD
-      - echo "In both cases, and for security reasons, you will see asteriks '*******' instead the value under the echo command." 
-     
+        from_secret: docker_password     
      # - sleep 5 ## give docker enough time to start
       #- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       #- docker build -t lunavirtualnet/poc-site:${DRONE_COMMIT_SHA:0:7} .
