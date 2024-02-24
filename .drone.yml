@@ -19,23 +19,13 @@ steps:
     image: docker:dind
     volumes:
       - name: dockersock
-        path: /var/run
+        path: claudiofrjr-devops/site-poc 
     privileged: true
     commands:
       - sleep 5 ## give docker enough time to start
-      - echo "$docker_password" | docker login -u "$docker_username" --password-stdin
-      - docker build -t lunavirtualnet/site-poc:${DRONE_COMMIT_SHA:0:7} .
-      - docker push lunavirtualnet/site-poc:${DRONE_COMMIT_SHA:0:7}
-    settings:
-      repo: claudiofrjr-devops/site-poc
-      username:
-        from_secret: docker_username
-      password:
-        from_secret: docker_password     
-     # - sleep 5 ## give docker enough time to start
-      #- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      #- docker build -t lunavirtualnet/poc-site:${DRONE_COMMIT_SHA:0:7} .
-      #- docker push lunavirtualnet/poc-site:${DRONE_COMMIT_SHA:0:7}
+      - docker login -u lunavirtualnet -p Luna&Liz2612 #ou qualquer registry
+      - docker build  -t lunavirtualnet/poc-site:${DRONE_COMMIT_SHA:0:7} .
+      - docker push lunavirtualnet/poc-site:${DRONE_COMMIT_SHA:0:7}
 
 ######################################################   Delivery
   - name: delivery
@@ -43,7 +33,7 @@ steps:
     commands:
       - git clone git@github.com:claudiofrjr-devops/deploy-applications.git
       - cd deploy-applications 
-      - sed -E -i.bak 's%(lunavirtualnet/site-poc:).*%lunavirtualnet/site-poc:${DRONE_COMMIT_SHA:0:7}%' site-helm/templates/uzi-poc-site-deployment.yml
+      - sed -E -i.bak 's%(lunavirtualnet/poc-site:).*%lunavirtualnet/poc-site:${DRONE_COMMIT_SHA:0:7}%' site-helm/templates/uzi-poc-site-deployment.yml
       - git add . && git commit -m "Change image site-poc to lunavirtualnet/poc-site:${DRONE_COMMIT_SHA:0:7}" && git push
 
 
